@@ -78,6 +78,8 @@
 
 
         /* Hero Image Layout - التنسيق المصلح والكامل */
+        /* تصميم الكولاج الفني - Artistic Layered Layout */
+        /* Hero Image - Simple & Clean */
         .hero-wrapper {
             position: relative;
             width: 280px;
@@ -87,103 +89,143 @@
         }
 
         @media (min-width: 768px) {
-            .hero-wrapper { width: 400px; height: 400px; }
+            .hero-wrapper { width: 380px; height: 380px; }
         }
 
-        /* الخلفية الرمادية الغامقة */
+        /* المربع الخلفي (بسيط جداً) */
         .hero-bg-shape {
             position: absolute;
             inset: 0;
             background-color: #2D2D2D;
-            background-image: radial-gradient(#444 1px, transparent 1px);
-            background-size: 20px 20px;
             border: 4px solid #000;
-            box-shadow: 12px 12px 0px #1A1A1A;
-            transform: rotate(-3deg);
+            box-shadow: 10px 10px 0px #000;
+            transform: rotate(-4deg);
             z-index: 1;
         }
 
-        /* الدائرة الصفراء */
+        /* الدائرة الصفراء والصورة */
         .hero-circle {
             position: absolute;
-            inset: 0;
-            background-color: #F9B115;
-            border: 5px solid #000;
+            inset: 10px;
+            background-color: var(--accent);
+            border: 4px solid #000;
             border-radius: 50%;
             z-index: 2;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(249, 177, 21, 0.2);
         }
 
-        /* الصورة: ألوان طبيعية ومنورة */
         .hero-img {
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 100%;
+            width: 105%; /* تكبير بسيط للملائمة */
             height: auto;
             z-index: 5;
-            filter: contrast(1.05) brightness(1.1); /* زيادة الإضاءة */
-            display: block !important;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: contrast(1.05) brightness(1.1);
         }
 
-        .hero-wrapper:hover .hero-img {
-            transform: translateX(-50%) scale(1.08);
-        }
+/* Lightbox Style */
+#lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    cursor: zoom-out;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-        /* الأيقونات الزخرفية */
-        .deco-shape {
-            position: absolute;
-            z-index: 20;
-            filter: drop-shadow(3px 3px 0px #000);
-        }
+/* Lightbox الأساسي */
+#lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999; /* أعلى من كل شيء */
+    cursor: zoom-out;
+    align-items: center;
+    justify-content: center;
+}
 
+#lightbox.active { display: flex; } /* هذا السطر هو المحرك */
 
+#lightbox img {
+    max-width: 90%;
+    max-height: 85%;
+    object-fit: contain;
+    border: 5px solid #000;
+    box-shadow: 10px 10px 0px var(--accent);
+}
+
+#loading-bar {
+    width: 0%;
+    /* حركة تعبئة الشريط */
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.animate-bounce {
+    animation: bounce 0.6s infinite;
+}
     </style>
 </head>
 <body class="no-scroll">
 <div id="scroll-progress"></div>
 
     <!-- شاشة التحميل -->
-        <div id="splash">
-        <h1 class="text-3xl md:text-5xl font-heading text-black mb-8 text-center px-6 leading-tight">
-            Welcome to <br class="md:hidden"> My Portfolio
-        </h1>
+            <div id="splash" class="fixed inset-0 bg-yellow-400 z-[2000] flex flex-col items-center justify-center transition-transform duration-700">
+        <h1 class="text-3xl md:text-5xl font-black uppercase mb-4 text-black">Welcome to <br>My Portfolio</h1>
         
-        <div class="flex flex-col items-center gap-4">
-            <div class="animate-bounce">
-                <i data-lucide="zap" size="48" class="fill-black"></i>
-            </div>
-            <p class="text-[10px] font-black uppercase tracking-[0.4em] opacity-70">
-                Initialising...
-            </p>
+        <div class="mb-6 animate-bounce">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" class="text-black"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
+
+        <div class="w-64 h-6 border-4 border-black bg-white shadow-[4px_4px_0px_rgba(0,0,0,1)] relative overflow-hidden">
+            <div id="loading-bar" class="h-full bg-black w-0 transition-all duration-100"></div>
+        </div>
+        
+        <div id="loading-perc" class="mt-4 font-black text-xl text-black">0%</div>
+        
+        <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">Initialising System...</p>
+    </div>
     </div>
 
 
     <!-- النافبار -->
-        <nav class="fixed top-0 w-full z-[100] px-4 py-3 bg-white/70 backdrop-blur-md border-b-4 border-black">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <span class="text-xl md:text-2xl font-heading tracking-tighter uppercase">
-                MY <span class="text-yellow-600">PORTFOLIO.</span>
-            </span>
+       <nav class="fixed top-0 w-full z-[100] px-4 py-3 bg-white/70 backdrop-blur-md border-b-4 border-black">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <span class="text-xl md:text-2xl font-heading tracking-tighter uppercase font-black">
+            MY <span class="text-yellow-600">PORTFOLIO.</span>
+        </span>
 
-            <div class="flex items-center gap-2 md:gap-4">
-                <div class="hidden sm:flex items-center gap-2">
-                    <a href="mailto:Moabdo038@gmail.com" title="Email Me" class="p-2 bg-white border-2 border-black hover:bg-yellow-400 transition-colors rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                        <i data-lucide="mail" size="18"></i>
-                    </a>
-                    <a href="https://github.com/moabdo038-debug" target="_blank" title="GitHub" class="p-2 bg-white border-2 border-black hover:bg-yellow-400 transition-colors rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                        <i data-lucide="github" size="18"></i>
-                    </a>
-                </div>
+        <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-2">
+                <a href="https://www.linkedin.com/in/abdoelrahman-salem-065a82400" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="p-2 bg-white border-2 border-black hover:bg-yellow-400 transition-colors rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                </a>
 
-                <a href="https://wa.me/966550340929" target="_blank" 
-                   class="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider hover:bg-yellow-500 hover:text-black transition-all border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                    <i data-lucide="message-circle" size="16"></i>
-                    <span>Contact Me</span>
+                <a href="https://www.instagram.com/abdo_salem07?igsh=b3dzMnZsM3I1Y2pu" target="_blank" title="Instagram" class="p-2 bg-white border-2 border-black hover:bg-pink-500 transition-colors rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center justify-center group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black group-hover:text-white"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                </a>
+
+                <a href="https://www.facebook.com/share/1B8Xn3J1wi/" target="_blank" title="Facebook" class="p-2 bg-white border-2 border-black hover:bg-blue-600 transition-colors rounded-lg shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center justify-center group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black group-hover:text-white"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                </a>
+            </div>
+
+            <a href="https://wa.me/966550340929" target="_blank" 
+               class="flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-wider hover:bg-black hover:text-white transition-all border-2 border-black shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.414 0 .018 5.393 0 12.03c0 2.123.554 4.197 1.606 6.035L0 24l6.117-1.605a11.837 11.837 0 0 0 5.925 1.586h.005c6.637 0 12.032-5.391 12.036-12.028a11.8 11.8 0 0 0-3.417-8.508z"/></svg>
+                <span>Contact Me</span>
+            </a>
+        </div>
+    </div>
+</nav>
                 </a>
             </div>
         </div>
@@ -197,7 +239,7 @@
                 <div class="flex flex-col items-center text-center">
                     
                     <!-- الصورة الشخصية -->
-                    <div class="reveal active mb-16">
+                   <div class="reveal active mb-16">
     <div class="hero-wrapper">
         <div class="hero-bg-shape"></div>
         
@@ -206,18 +248,18 @@
                  class="hero-img" alt="Abdurhulman Ayman">
         </div>
 
-        <div class="deco-shape -top-5 -right-5 rotate-12 text-black">
-            <i data-lucide="star" size="35" class="fill-yellow-500"></i>
+        <div class="absolute -top-4 -right-4 rotate-12 text-black">
+            <i data-lucide="star" size="32" class="fill-yellow-500"></i>
         </div>
-        <div class="bg-text parallax-text -bottom-10 -left-10 text-[10rem] md:text-[20rem]">HERO</div>
     </div>
 </div>
+
 
                     <!-- النصوص -->
                     <div class="reveal active">
                         <div class="flex items-center justify-center gap-2 mb-4">
                             <span class="w-8 h-[3px] bg-black"></span>
-                            <span class="font-bold text-xs uppercase tracking-widest">Engineering & Design</span>
+                            <span class="font-bold text-xs uppercase tracking-widest">Developer & graphic designer</span>
                             <span class="w-8 h-[3px] bg-black"></span>
                         </div>
                         <h1 class="text-5xl md:text-8xl lg:text-9xl font-heading leading-none mb-6">
@@ -261,7 +303,10 @@
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="pop-card p-6 flex gap-4 items-center">
                         <div class="w-12 h-12 bg-yellow-500 border-2 border-black flex items-center justify-center shrink-0"><i data-lucide="code"></i></div>
-                        <div><h4 class="font-bold">Engineering</h4><p class="text-xs text-gray-500">Scalable Logic</p></div>
+                        <div>
+    <h4 class="font-bold">Frontend</h4>
+    <p class="text-xs text-gray-500">Development</p>
+</div>
                     </div>
                     <div class="pop-card p-6 flex gap-4 items-center">
                         <div class="w-12 h-12 bg-yellow-500 border-2 border-black flex items-center justify-center shrink-0"><i data-lucide="palette"></i></div>
@@ -269,7 +314,10 @@
                     </div>
                     <div class="pop-card p-6 flex gap-4 items-center lg:col-span-1">
                         <div class="w-12 h-12 bg-yellow-500 border-2 border-black flex items-center justify-center shrink-0"><i data-lucide="zap"></i></div>
-                        <div><h4 class="font-bold">Magic</h4><p class="text-xs text-gray-500">Fullstack Delivery</p></div>
+                        <div>
+    <h4 class="font-bold">Visual</h4>
+    <p class="text-xs text-gray-500">Graphic Design</p>
+</div>
                     </div>
                 </div>
             </div>
@@ -370,134 +418,190 @@
 
         <!-- المشاريع (Works) -->
                 <section id="projects" class="py-20 px-4 bg-black text-white relative overflow-hidden">
-            <div class="max-w-7xl mx-auto relative z-10">
-                <div class="reveal mb-16">
-                    <h2 class="text-5xl md:text-8xl font-heading leading-tight">SELECTED <br><span class="text-yellow-500">WORKS.</span></h2>
-                </div>
-                
-                <div class="reveal mb-10">
-                    <h3 class="text-2xl md:text-4xl font-heading text-white border-l-8 border-yellow-500 pl-4">WEB <span class="text-gray-500">DEV.</span></h3>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
-                    <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/LzHVZcm7/Screenshot-2026-04-27-04-27-09-62-40deb401b9ffe8e1df2f1cc5ba480b12.jpg" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Wedding Invite">
-                        <div class="p-6">
-                            <h3 class="font-heading text-xl mb-2">Wedding <span class="text-yellow-500">Invitation</span></h3>
-                            <a href="https://moabdo038-debug.github.io/-wedding/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
-                        </div>
-                    </div>
-                    <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/xSKKShFT/Screenshot-2026-04-27-04-25-44-69-40deb401b9ffe8e1df2f1cc5ba480b12.jpg" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Crunchy Menu">
-                        <div class="p-6">
-                            <h3 class="font-heading text-xl mb-2">Crunchy <span class="text-yellow-500">Menu</span></h3>
-                            <a href="https://menu-crunchy.vercel.app/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
-                        </div>
-                    </div>
-                    <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/zVb53p8f/Picsart-26-01-20-22-59-13-183.png" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Al-Yaqeen">
-                        <div class="p-6">
-                            <h3 class="font-heading text-xl mb-2">Al-Yaqeen <span class="text-yellow-500">Platform</span></h3>
-                            <a href="https://elyaqeen.netlify.app/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="reveal mb-10">
-                    <h3 class="text-2xl md:text-4xl font-heading text-white border-l-8 border-yellow-500 pl-4">GRAPHIC <span class="text-gray-500">DESIGN.</span></h3>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="https://i.ibb.co/Y4dN6w8x/Picsart-26-04-27-04-18-55-061.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/Y4dN6w8x/Picsart-26-04-27-04-18-55-061.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 1">
-                    </a>
-                    <a href="https://i.ibb.co/My4V5m8x/Picsart-26-04-27-04-20-23-276.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/My4V5m8x/Picsart-26-04-27-04-20-23-276.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 2">
-                    </a>
-                    <a href="https://i.ibb.co/mrCxZZ2F/Picsart-26-04-27-04-12-17-847.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/mrCxZZ2F/Picsart-26-04-27-04-12-17-847.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 3">
-                    </a>
-                    <a href="https://i.ibb.co/p6WsLCBP/Picsart-26-04-27-04-14-27-682.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/p6WsLCBP/Picsart-26-04-27-04-14-27-682.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 4">
-                    </a>
-                    <a href="https://i.ibb.co/7JXV5ZV7/Picsart-26-04-27-04-07-25-620.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/7JXV5ZV7/Picsart-26-04-27-04-07-25-620.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 5">
-                    </a>
-                    <a href="https://i.ibb.co/N6pLfH6h/Picsart-26-04-27-04-09-02-626.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/N6pLfH6h/Picsart-26-04-27-04-09-02-626.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 6">
-                    </a>
-                    <a href="https://i.ibb.co/Q30Jsc2r/mune.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/Q30Jsc2r/mune.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 7">
-                    </a>
-                    <a href="https://i.ibb.co/BKtQZGtd/share-image-png.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/BKtQZGtd/share-image-png.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 8">
-                    </a>
-                    <a href="https://i.ibb.co/gZy5XS0Q/Picsart-26-04-06-21-05-37-645.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/gZy5XS0Q/Picsart-26-04-06-21-05-37-645.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 9">
-                    </a>
-                    <a href="https://i.ibb.co/yms7rcbH/Picsart-26-04-06-21-08-34-675.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
-                        <img src="https://i.ibb.co/yms7rcbH/Picsart-26-04-06-21-08-34-675.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 10">
-                    </a>
+    <div class="max-w-7xl mx-auto relative z-10">
+        <div class="reveal mb-16">
+            <h2 class="text-5xl md:text-8xl font-heading leading-tight">SELECTED <br><span class="text-yellow-500">WORKS.</span></h2>
+        </div>
+        
+        <div class="reveal mb-10">
+            <h3 class="text-2xl md:text-4xl font-heading text-white border-l-8 border-yellow-500 pl-4">WEB <span class="text-gray-500">DEV.</span></h3>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+            <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/zhrRgJ6v/IMG-20260427-051414.jpg" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Wedding Invite">
+                <div class="p-6">
+                    <h3 class="font-heading text-xl mb-2">Wedding <span class="text-yellow-500">Invitation</span></h3>
+                    <a href="https://mohamed-omnia.netlify.app/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
                 </div>
             </div>
-            <div class="bg-text parallax-text -bottom-10 -right-10 text-[10rem] md:text-[20rem] opacity-5">WORKS</div>
-        </section>
+            <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/ZRTWRkVK/IMG-20260427-051332.jpg" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Crunchy Menu">
+                <div class="p-6">
+                    <h3 class="font-heading text-xl mb-2">Crunchy <span class="text-yellow-500">Menu</span></h3>
+                    <a href="https://menu-crunchy.vercel.app/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
+                </div>
+            </div>
+            <div class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/zVb53p8f/Picsart-26-01-20-22-59-13-183.png" class="w-full aspect-video object-cover transition-transform group-hover:scale-105" alt="Al-Yaqeen">
+                <div class="p-6">
+                    <h3 class="font-heading text-xl mb-2">Al-Yaqeen <span class="text-yellow-500">Platform</span></h3>
+                    <a href="https://elyaqeen.netlify.app/" target="_blank" class="text-yellow-500 text-xs font-bold uppercase underline">Explore Site</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="reveal mb-10">
+            <h3 class="text-2xl md:text-4xl font-heading text-white border-l-8 border-yellow-500 pl-4">GRAPHIC <span class="text-gray-500">DESIGN.</span></h3>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <a href="https://i.ibb.co/Y4dN6w8x/Picsart-26-04-27-04-18-55-061.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/Y4dN6w8x/Picsart-26-04-27-04-18-55-061.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 1">
+            </a>
+            <a href="https://i.ibb.co/My4V5m8x/Picsart-26-04-27-04-20-23-276.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/My4V5m8x/Picsart-26-04-27-04-20-23-276.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 2">
+            </a>
+            <a href="https://i.ibb.co/mrCxZZ2F/Picsart-26-04-27-04-12-17-847.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/mrCxZZ2F/Picsart-26-04-27-04-12-17-847.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 3">
+            </a>
+            <a href="https://i.ibb.co/p6WsLCBP/Picsart-26-04-27-04-14-27-682.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/p6WsLCBP/Picsart-26-04-27-04-14-27-682.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 4">
+            </a>
+            <a href="https://i.ibb.co/7JXV5ZV7/Picsart-26-04-27-04-07-25-620.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/7JXV5ZV7/Picsart-26-04-27-04-07-25-620.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 5">
+            </a>
+            <a href="https://i.ibb.co/N6pLfH6h/Picsart-26-04-27-04-09-02-626.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/N6pLfH6h/Picsart-26-04-27-04-09-02-626.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 6">
+            </a>
+            <a href="https://i.ibb.co/Q30Jsc2r/mune.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/Q30Jsc2r/mune.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 7">
+            </a>
+            <a href="https://i.ibb.co/BKtQZGtd/share-image-png.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/BKtQZGtd/share-image-png.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 8">
+            </a>
+            <a href="https://i.ibb.co/gZy5XS0Q/Picsart-26-04-06-21-05-37-645.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/gZy5XS0Q/Picsart-26-04-06-21-05-37-645.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 9">
+            </a>
+            <a href="https://i.ibb.co/yms7rcbH/Picsart-26-04-06-21-08-34-675.jpg" target="_blank" class="reveal pop-card !bg-[#111] !border-white/20 overflow-hidden group">
+                <img src="https://i.ibb.co/yms7rcbH/Picsart-26-04-06-21-08-34-675.jpg" class="w-full h-full object-cover transition-transform group-hover:scale-110" alt="Design 10">
+            </a>
+        </div>
+    </div>
+    <div class="bg-text parallax-text -bottom-10 -right-10 text-[10rem] md:text-[20rem] opacity-5">WORKS</div>
+</section>
+
 
 
         <!-- التذييل -->
-        <footer class="py-16 px-4 bg-yellow-500 text-black text-center border-t-4 border-black">
+                <footer class="py-16 px-4 bg-yellow-500 text-black text-center border-t-4 border-black">
             <h2 class="text-4xl md:text-7xl font-heading mb-8">LET'S BUILD.</h2>
             <div class="flex flex-col gap-4 font-bold uppercase text-xs mb-10">
-                <a href="mailto:Moabdo038@gmail.com">Moabdo038@gmail.com</a>
-                <a href="https://wa.me/966550340929">+966 55 034 0929</a>
+                <a href="mailto:Moabdo038@gmail.com" class="hover:underline">Moabdo038@gmail.com</a>
+                <a href="https://wa.me/966550340929" target="_blank" class="hover:underline">+966 55 034 0929</a>
             </div>
             <p class="text-[8px] font-black opacity-40 uppercase tracking-[0.5em]">© 2026 ABDURHULMAN AYMAN SHABAN</p>
         </footer>
     </main>
+<div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Preview">
+</div>
 
     <script>
-        lucide.createIcons();
+    // 1. تشغيل الأيقونات
+    lucide.createIcons();
 
+    // 2. منطق شاشة التحميل (Loading Screen)
     window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('splash').style.transform = 'translateY(-100%)';
-            document.body.classList.remove('no-scroll');
-            handleReveal();
-        }, 1500);
+        let progress = 0;
+        const bar = document.getElementById('loading-bar');
+        const perc = document.getElementById('loading-perc');
+        const splash = document.getElementById('splash');
+        
+        // محاكي للتحميل ليظهر للزائر
+        const interval = setInterval(() => {
+            progress += Math.random() * 15; // سرعة عشوائية للتحميل
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                
+                // إخفاء شاشة التحميل بعد الوصول لـ 100%
+                setTimeout(() => {
+                    splash.style.transform = 'translateY(-100%)';
+                    document.body.style.overflow = 'auto'; // السماح بالسكرول
+                    handleReveal(); // تفعيل حركات الظهور فوراً
+                }, 500);
+            }
+            
+            if(bar) bar.style.width = progress + '%';
+            if(perc) perc.innerText = Math.floor(progress) + '%';
+        }, 80);
     });
 
-    function handleAnimations() {
-        const scrolled = window.pageYOffset;
-        
-        // 1. شريط التقدم
-        const winHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolledPercentage = (scrolled / winHeight) * 100;
-        document.getElementById('scroll-progress').style.width = scrolledPercentage + "%";
-
-        // 2. حركة النصوص الخلفية (Parallax)
-        const parallaxTexts = document.querySelectorAll('.parallax-text');
-        parallaxTexts.forEach(text => {
-            let speed = 0.1;
-            text.style.transform = `translateX(${scrolled * speed}px)`;
-        });
-
-        // 3. تفعيل ظهور العناصر
-        handleReveal();
+    // 3. منطق نافذة عرض الصور (Lightbox)
+    function openLightbox(src) {
+        const lb = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+        if (lb && lbImg) {
+            lbImg.src = src;
+            lb.classList.add('active');
+            document.body.style.overflow = 'hidden'; // منع السكرول أثناء العرض
+        }
     }
 
+    function closeLightbox() {
+        const lb = document.getElementById('lightbox');
+        if (lb) {
+            lb.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    // ربط صور الجرافيك باللايت بوكس تلقائياً
+    document.addEventListener('DOMContentLoaded', () => {
+        const graphicLinks = document.querySelectorAll('#projects a');
+        graphicLinks.forEach(link => {
+            // نتحقق إذا كان الرابط يفتح صورة مباشرة
+            if (link.href.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openLightbox(this.href);
+                });
+            }
+        });
+    });
+
+    // 4. حركات السكرول والبارالاكس (Scroll Effects)
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        
+        // تحديث شريط التقدم العلوي
+        const winHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolledPercentage = (scrolled / winHeight) * 100;
+        const progressBar = document.getElementById('scroll-progress');
+        if(progressBar) progressBar.style.width = scrolledPercentage + "%";
+        
+        // حركة النص الخلفي (Parallax)
+        document.querySelectorAll('.parallax-text').forEach(text => {
+            text.style.transform = `translateX(${scrolled * 0.15}px)`;
+        });
+
+        handleReveal(); // تشغيل حركات ظهور العناصر
+    });
+
+    // دالة ظهور العناصر عند السكرول
     function handleReveal() {
-        const reveals = document.querySelectorAll('.reveal');
-        reveals.forEach((el) => {
+        document.querySelectorAll('.reveal').forEach((el) => {
             const rect = el.getBoundingClientRect();
-            // تفعيل العنصر عندما يقترب من منتصف الشاشة
+            // تفعيل الحركة إذا وصل العنصر لمساحة الرؤية
             if (rect.top < window.innerHeight * 0.85) {
                 el.classList.add('active');
             }
         });
     }
 
-    // استماع لحركة السكرول بشكل مستمر
-    window.addEventListener('scroll', handleAnimations);
-
+    // تفعيل أولي عند التحميل
+    handleReveal();
 </script>
+
 </body>
 </html>
 
